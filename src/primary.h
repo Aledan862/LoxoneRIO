@@ -6,7 +6,7 @@
 #include <Cmd.h>
 #ifndef ETHERNET_DISABLE
 #include "ethernetserver.h"
-#endifcd
+#endif
 
 void main_setup();
 
