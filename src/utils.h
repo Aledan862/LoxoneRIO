@@ -17,7 +17,8 @@ GIT:      https://github.com/anklimov/lighthub
 e-mail    anklimov@gmail.com
 
 */
-#pragma once
+#ifndef utils_h
+#define utils_h
 
 #define Q(x) #x
 #define QUOTE(x) Q(x)
@@ -32,12 +33,6 @@ e-mail    anklimov@gmail.com
 
 #include "Streaming.h"
 
-enum topicType {
-    T_DEV = 1,
-    T_BCST= 2,
-    T_OUT = 3
-  };
-
 void PrintBytes(uint8_t* addr, uint8_t count, bool newline);
 void SetBytes(uint8_t* addr, uint8_t count, char * out);
 void SetAddr(char * out,  uint8_t* addr);
@@ -48,10 +43,11 @@ void parseBytes(const char* str, char separator, byte* bytes, int maxBytes, int 
 int log(const char *str, ...);
 void printFloatValueToStr(float value, char *valstr);
 void ReadUniqueID( uint32_t * pdwUniqueID );
-int inet_aton(const char* aIPAddrString, IPAddress& aResult);
-char *inet_ntoa_r(IPAddress addr, char *buf, int buflen);
+
 void printIPAddress(IPAddress ipAddress);
-char* setTopic(char* buf, int8_t buflen, topicType tt, char* suffix = NULL);
+
 void printUlongValueToStr(char *valstr, unsigned long value);
 void scan_i2c_bus();
 void softRebootFunc();
+
+#endif

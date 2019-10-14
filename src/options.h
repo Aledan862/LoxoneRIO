@@ -21,9 +21,9 @@
 #endif
 
 #ifndef CUSTOM_FIRMWARE_IP
-#define DEFAULT_FIRMWARE_IP {192, 168,  1, 37};
-// DNS[]    = {   ,    ,   ,   };
-// GATEWAY[]  = {192, 168,  1,  1};
+#define DEFAULT_FIRMWARE_IP {192, 168,  0, 122}
+// DNS[]    = {   ,    ,   ,   }
+// GATEWAY[]  = {192, 168,  1,  1}
 #endif
 
 #ifndef LAN_INIT_DELAY
