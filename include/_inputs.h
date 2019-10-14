@@ -19,7 +19,7 @@ e-mail    anklimov@gmail.com
 */
 #pragma once
 #include <aJSON.h>
-#include "modules/in_ccs811_hdc1080.h"
+// #include "modules/in_ccs811_hdc1080.h"
 
 #define IN_ACTIVE_HIGH   2      // High level = PUSHED/ CLOSED/ ON othervise :Low Level. Use INPUT mode instead of INPUT_PULLUP for digital pin
 #define IN_ANALOG        64     // Analog input

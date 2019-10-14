@@ -50,4 +50,7 @@ void printUlongValueToStr(char *valstr, unsigned long value);
 void scan_i2c_bus();
 void softRebootFunc();
 
+void StrClear(char *str, char length);
+char StrContains(char *str, char *sfind);
+
 #endif

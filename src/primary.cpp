@@ -9,6 +9,7 @@ void setup_main() {
     sd_card_w5100_setup();
   #endif
   //TODO  setupMacAddress();
+  doInit();
   serverinit();
 }
 

@@ -88,7 +88,7 @@ void insert(File file, EthernetClient cl) {
 }
 
 void insertThis(String fileNname, EthernetClient cl) {
-  insertFile = SD.open(fileNname);
+  insertFile = SD.open(fileNname.c_str());
   if (insertFile) {
     insert(insertFile, cl);
     insertFile.close();

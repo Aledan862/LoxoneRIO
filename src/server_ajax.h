@@ -1,5 +1,6 @@
 #pragma once
 #include "utils.h"
+#include "iomodule.h"
 #include "server_maker.h"
 // HTTP request
 #define REQ_BUF_SIZE 128
@@ -9,24 +10,60 @@
 // webFile
 #define MAX_BUFFER_SIZE 256
 
-// Markers
-#define MARKER     0x25 // %
-#define LINKS      0x26 // &
-#define SCRIPTS    0x23 // #
-#define HEADER     0x31 // 1
-#define DASH       0x32 // 2
-#define MENU       0x33 // 3
-#define FOOTER     0x34 // 4
-#define BANNERS    0x35 // 5
-#define ALT_MENU   0x36 // 6
-#define ALT_CSS    0x37 // 7
-#define PRO        0x38 // 8
-#define ADDRESS    0x21 // !
-#define FLOTR2     0x3F // ?
-#define PROCESSING 0x2B // +
-#define THREE      0x40 // @
-#define JQUERY     0x3D // =
-
 int checkMarker(int startPos, int endPos);
 void sendDelta(int startPos, int endPos, EthernetClient cl);
 void markersWorks(int pos, EthernetClient cl);
+
+// Server works
+
+void serverWorks2(EthernetClient sclient);
+void serverWorks();
+
+
+// Server Answers
+
+String makeAnswer(String content);
+
+void sendHtmlAnswer(EthernetClient cl);
+void sendCssAnswer (EthernetClient cl);
+void sendJsAnswer  (EthernetClient cl);
+void sendGifAnswer (EthernetClient cl);
+void sendPngAnswer (EthernetClient cl);
+void sendJpgAnswer (EthernetClient cl);
+void sendXmlAnswer (EthernetClient cl);
+void sendIcoAnswer (EthernetClient cl);
+
+//void sendDownAnswer(EthernetClient cl);
+//void sendPdfAnswer (EthernetClient cl);
+//void sendZipAnswer (EthernetClient cl);
+//void sendGzAnswer  (EthernetClient cl);
+//void sendElseAnswer(EthernetClient cl);
+
+void sendErrorAnswer(char mess[], EthernetClient cl);
+String tagXmlVersion();
+String openInputs();
+String closeInputs();
+
+// Tags
+
+String makeTag(String tagBase, String tagCount, String value);
+
+// File
+
+bool openWebFile();
+bool openIndexFile(String s);
+String partSuffix(byte design);
+
+// Parse Request
+
+void parseRequest(EthernetClient cl);
+
+// For creating Requests
+
+String makeDigitalPorts();
+String makeAnalogPorts();
+String makeHttpReq();
+// Indicators
+void respIndicators(EthernetClient cl);
+// Generic
+void setGeneric();

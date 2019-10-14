@@ -8,6 +8,9 @@
 */
 #include "server_ajax.h"
 
+//Webserver
+extern EthernetServer server;
+
 // HTTP request
 char HTTP_req[REQ_BUF_SIZE] = {0}; // null terminated string
 int reqIndex = 0;
@@ -125,41 +128,33 @@ void serverWorks2(EthernetClient sclient) {
            respond to client only after last line received */
 
         if (c == '\n' && currentLineIsBlank) {
-          if (authMode == OFF || (authMode == ON && request.lastIndexOf(AUTH_HASH) > -1)) {
-
-            //Serial.println(request.length());
-            //Serial.println(request);
-            
-            parseCommands(sclient);
-            parseRequest(sclient); 
-
-            if (webFile) {
-              while(webFile.available()) {
-                rsize = webFile.read(buff, MAX_BUFFER_SIZE);
-              
-                if (allowMarkers) {
-                  markersWorks(0, sclient);
-                } else {
-                    sclient.write(buff, rsize);
-                  }
-              }
-                      
-              webFile.close();
-            } // if (webFile)
-               
-            // Reset buffer index and all buffer elements to 0
-            reqIndex = 0;
-            StrClear(HTTP_req, REQ_BUF_SIZE);
-            request = "";
-     
-          } else { // if (authMode == AUTH_OFF || (authMode == AUTH_ON && request.lastIndexOf(AUTH_HASH) > -1))
-              request = "";
-              sclient.println(F("HTTP/1.0 401 Unauthorized"));
-              sclient.println(F("WWW-Authenticate: Basic realm=\"Arduino Mega Server\""));
-            }
           
-          break;
-        }
+
+          //Serial.println(request.length());
+          //Serial.println(request);
+          
+          //parseCommands(sclient);
+          parseRequest(sclient); 
+
+          if (webFile) {
+            while(webFile.available()) {
+              rsize = webFile.read(buff, MAX_BUFFER_SIZE);
+            
+              if (allowMarkers) {
+                markersWorks(0, sclient);
+              } else {
+                  sclient.write(buff, rsize);
+                }
+            }
+                      
+            webFile.close();
+          } // if (webFile)
+               
+          // Reset buffer index and all buffer elements to 0
+          reqIndex = 0;
+          StrClear(HTTP_req, REQ_BUF_SIZE);
+          request = "";
+        }     
         
         // every line of text received from the client ends with \r\n
         if (c == '\n') {
@@ -208,9 +203,9 @@ String makeAnswer(String content) {
 void sendHtmlAnswer(EthernetClient cl) {cl.println(makeAnswer(F("text/html")));}
 void sendCssAnswer (EthernetClient cl) {cl.println(makeAnswer(F("text/css")));}
 void sendJsAnswer  (EthernetClient cl) {cl.println(makeAnswer(F("application/javascript")));}
+void sendGifAnswer (EthernetClient cl) {cl.println(makeAnswer(F("image/gif")));}
 void sendPngAnswer (EthernetClient cl) {cl.println(makeAnswer(F("image/png")));}
 void sendJpgAnswer (EthernetClient cl) {cl.println(makeAnswer(F("image/jpeg")));}
-void sendGifAnswer (EthernetClient cl) {cl.println(makeAnswer(F("image/gif")));}
 void sendXmlAnswer (EthernetClient cl) {cl.println(makeAnswer(F("text/xml")));}
 void sendIcoAnswer (EthernetClient cl) {cl.println(makeAnswer(F("image/x-icon")));}
 
@@ -252,7 +247,7 @@ bool openWebFile() {
 }
 
 bool openIndexFile(String s) {
-  webFile = SD.open(INDEX_STR + s + HTM_EXT);
+  webFile = SD.open((INDEX_STR + s + HTM_EXT).c_str());
   if (webFile) {return true;}
           else {return false;}
 }
@@ -274,12 +269,12 @@ void parseRequest(EthernetClient cl) {
   
   // index request
   if (StrContains(HTTP_req, "GET / ") || StrContains(HTTP_req, "GET /index.htm")) {
-    if (openIndexFile(partSuffix(currentDesign))) {sendHtmlAnswer(cl);} else {webFile = SD.open(F("404.htm"));}
+    if (openIndexFile(partSuffix(currentDesign))) {sendHtmlAnswer(cl);} else {webFile = SD.open("404.htm");}
     allowMarkers = true;
   }
   else if (StrContains(HTTP_req, GET)) {
     // files requests
-    if      (StrContains(HTTP_req, HTM_EXT)) {if (openWebFile()) {sendHtmlAnswer(cl);} else {webFile = SD.open(F("404.htm"));} allowMarkers = true;}
+    if      (StrContains(HTTP_req, HTM_EXT)) {if (openWebFile()) {sendHtmlAnswer(cl);} else {webFile = SD.open("404.htm");} allowMarkers = true;}
     else if (StrContains(HTTP_req, ".css"))  {if (openWebFile()) {sendCssAnswer(cl);}  else {sendErrorAnswer("", cl);}}
     else if (StrContains(HTTP_req, ".js"))   {if (openWebFile()) {sendJsAnswer(cl);}   else {sendErrorAnswer("", cl);}}
     else if (StrContains(HTTP_req, ".pde"))  {if (openWebFile()) {sendJsAnswer(cl);}   else {sendErrorAnswer("", cl);}}
@@ -338,7 +333,7 @@ void parseRequest(EthernetClient cl) {
     return s;
   }
 #endif
-
+/*
 String makeModules() {
   String s = "";
   s += makeTag(F("mSdInfo"),  "", String(moduleSdInfo));
@@ -358,25 +353,26 @@ String makeModules() {
   s += makeTag(F("mNooMt"),   "", String(moduleMt1132));
   s += makeTag(F("mNrf24"),   "", String(moduleNrf24));
   return s;
-}
+}*/
 
 String makeDigitalPorts() {
   String s = "";
-  byte pins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 22, 23, 24, 25, 26, 27, 30, 31};
-  for (byte i = 0; i < sizeof(pins); i++) {
-    s += makeTag("D", String(pins[i]), String(digitalRead(pins[i])));
+  for (byte i = 1; i <= MAX_DIGITAL_IN_PORTS; i++) {
+    s += makeTag("D", String(i), String(digitalRead(DI(i))));
   }
   return s;
 }
 
 String makeAnalogPorts() {
   String s = "";
-  for (byte i = 0; i < MAX_ANALOG_PORTS; i++) {
-    s += makeTag("A", String(i), String(analogRead(i)));
+  for (byte i = 1; i <= MAX_ANALOG_PORTS; i++) {
+    s += makeTag("A", String(i), String(analogRead(AI(i))));
   }
   return s;
 }
 
+// используется для DashRequest
+/* 
 String makeDigits(int digits) {
   String s = "";
   if (digits < 10) {s += '0';}
@@ -401,6 +397,7 @@ String makeCpuLoad() {
   s += makeTag("cycInSec", "", String(cyclosInSec));
   return s;
 }
+*/
 
 String makeHttpReq() {
   String s = "";
@@ -425,7 +422,18 @@ void respIndicators(EthernetClient cl) {
 
 // Generic
 
+
 void setGeneric() {
+
+  for (size_t i = 1; i <= MAX_DIGITAL_OUT_PORTS; i++)
+  {
+    if (StrContains(HTTP_req, strcat("DI","1"))){
+      int b=5;
+    };
+    /* code */
+  }
+  
+  
   // D3
   if (StrContains(HTTP_req, "LED4=1")) {
     LED_state[3] = 1;
@@ -897,7 +905,7 @@ void respSd(EthernetClient cl) {
 void respDash(EthernetClient cl) {
   String s = tagXmlVersion();
   s += openInputs();
-    s += makeModules();
+    //s += makeModules();
     s += makeTag("uptime",   "", stringUptime());
     s += makeTag("freeRAM",  "", String(freeMem()));
     s += makeCpuLoad();

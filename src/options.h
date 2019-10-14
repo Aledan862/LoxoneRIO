@@ -39,3 +39,19 @@
 
 #define W5500_ETHERNET_SHIELD
 #define W5500_CS_PIN 53
+
+// Sockets
+#define FREE_SOCKETS 1
+
+
+//Analog ports
+
+#define MAX_ANALOG_PORTS 8
+
+//Digital inputs ports
+
+#define MAX_DIGITAL_IN_PORTS 16
+
+//Digital outputs ports
+
+#define MAX_DIGITAL_OUT_PORTS 24

@@ -9,6 +9,7 @@
 #include "utils.h"
 #include <string.h>
 #include <Cmd.h>
+#include "iomodule.h"
 
 
 void setup_main();
