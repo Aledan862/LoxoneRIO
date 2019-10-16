@@ -264,6 +264,8 @@ String partSuffix(byte design) {
 
 // Parse Request
 
+//extern byte currentPage = UNKNOWN_PAGE;
+
 void parseRequest(EthernetClient cl) {
   allowMarkers = false;
   
@@ -283,19 +285,19 @@ void parseRequest(EthernetClient cl) {
     else if (StrContains(HTTP_req, ".gif"))  {if (openWebFile()) {sendGifAnswer(cl);}  else {sendErrorAnswer("", cl);}}
     else if (StrContains(HTTP_req, ".ico"))  {if (openWebFile()) {sendIcoAnswer(cl);}  else {sendErrorAnswer("", cl);}}
     // Ajax requests
-    else if (StrContains(HTTP_req, "request_dash"))    {sendXmlAnswer(cl); checkPage();      respDash(cl);}
+    // else if (StrContains(HTTP_req, "request_dash"))    {sendXmlAnswer(cl); checkPage();      respDash(cl);}
     else if (StrContains(HTTP_req, "reqIndicators"))   {sendXmlAnswer(cl);                   respIndicators(cl);}
     else if (StrContains(HTTP_req, "reqGeneric"))      {sendXmlAnswer(cl); setGeneric();     respGeneric(cl);}
-    else if (StrContains(HTTP_req, "reqSettings"))     {sendXmlAnswer(cl); setSettings();    respSettings(cl);}
+    // else if (StrContains(HTTP_req, "reqSettings"))     {sendXmlAnswer(cl); setSettings();    respSettings(cl);}
     else if (StrContains(HTTP_req, "request_themes"))  {sendXmlAnswer(cl); setTheme();       respThemes(cl);}
-    else if (StrContains(HTTP_req, "request_control")) {sendXmlAnswer(cl); setControl();     respControl(cl);}
-    else if (StrContains(HTTP_req, "request_noo"))     {sendXmlAnswer(cl); setMt1132();      respMt1132(cl);}
-    else if (StrContains(HTTP_req, "request_mr1132"))  {sendXmlAnswer(cl); setMr1132();      respMr1132(cl);}
-    else if (StrContains(HTTP_req, "req_el_control"))  {sendXmlAnswer(cl); setElectroCtrl(); respElectroCtrl(cl);}
-    else if (StrContains(HTTP_req, "req_el_freq"))     {sendXmlAnswer(cl); checkOscill();    respElectroFreq(cl);}
-    else if (StrContains(HTTP_req, "request_sdcard"))  {sendXmlAnswer(cl);                   respSd(cl);}
+    // else if (StrContains(HTTP_req, "request_control")) {sendXmlAnswer(cl); setControl();     respControl(cl);}
+    // else if (StrContains(HTTP_req, "request_noo"))     {sendXmlAnswer(cl); setMt1132();      respMt1132(cl);}
+    // else if (StrContains(HTTP_req, "request_mr1132"))  {sendXmlAnswer(cl); setMr1132();      respMr1132(cl);}
+    // else if (StrContains(HTTP_req, "req_el_control"))  {sendXmlAnswer(cl); setElectroCtrl(); respElectroCtrl(cl);}
+    // else if (StrContains(HTTP_req, "req_el_freq"))     {sendXmlAnswer(cl); checkOscill();    respElectroFreq(cl);}
+    // else if (StrContains(HTTP_req, "request_sdcard"))  {sendXmlAnswer(cl);                   respSd(cl);}
     else if (StrContains(HTTP_req, "request_network")) {sendXmlAnswer(cl);                   respNetwork(cl);}
-    else if (StrContains(HTTP_req, "request_nrf24"))   {sendXmlAnswer(cl);                   respNrf24(cl);}
+    // else if (StrContains(HTTP_req, "request_nrf24"))   {sendXmlAnswer(cl);                   respNrf24(cl);}
   } // else if (StrContains(HTTP_req, GET))
 } // parseRequest ( )
 
@@ -425,15 +427,16 @@ void respIndicators(EthernetClient cl) {
 
 void setGeneric() {
 
-  for (size_t i = 1; i <= MAX_DIGITAL_OUT_PORTS; i++)
+  for (int8_t i = 1; i <= MAX_DIGITAL_OUT_PORTS; i++)
   {
-    if (StrContains(HTTP_req, strcat("DI","1"))){
-      int b=5;
-    };
-    /* code */
+    if (StrContains(HTTP_req, String("DO"+ i) + "=1")){
+      digitalWrite(DO(i), HIGH);
+  } else if (StrContains(HTTP_req, String("DO"+ i) + "=0")) {
+      digitalWrite(DO(i), LOW);
+    }
   }
-  
-  
+    
+  /*
   // D3
   if (StrContains(HTTP_req, "LED4=1")) {
     LED_state[3] = 1;
@@ -442,31 +445,8 @@ void setGeneric() {
       LED_state[3] = 0;
       digitalWrite(3, LOW);
     }
-  // D5
-  if (StrContains(HTTP_req, "LED3=1")) {
-    LED_state[2] = 1;
-    digitalWrite(5, HIGH);
-  } else if (StrContains(HTTP_req, "LED3=0")) {
-      LED_state[2] = 0;
-      digitalWrite(5, LOW);
-    }
-  // D6
-  if (StrContains(HTTP_req, "LED1=1")) {
-    LED_state[0] = 1;  // save LED state
-    digitalWrite(6, HIGH);
-  } else if (StrContains(HTTP_req, "LED1=0")) {
-      LED_state[0] = 0;  // save LED state
-      digitalWrite(6, LOW);
-    }
+  */
 
-  // D7
-  if (StrContains(HTTP_req, "LED2=1")) {
-    LED_state[1] = 1;
-    digitalWrite(7, HIGH);
-  } else if (StrContains(HTTP_req, "LED2=0")) {
-      LED_state[1] = 0;
-      digitalWrite(7, LOW);
-    }
 } // SetGeneric()
 
 void respGeneric(EthernetClient cl) {
@@ -476,22 +456,25 @@ void respGeneric(EthernetClient cl) {
     s += makeHttpReq();
     
     // Analog
-    for (byte i = 0; i < 6; i++) { // A2 to A5
-      s += makeTag("analog", "", String(analogRead(i)));
+    for (byte i = 0; i <= MAX_ANALOG_PORTS; i++) { 
+      s += makeTag("analog", "", String(analogRead(AI(i))));
     }
     
-    // Switches
-    byte sw_arr[] = {42, 43, 45};
-    for (byte i = 0; i < 3; i++) {
-      s += makeTag("switch", "", digitalRead(sw_arr[i]) ? "ON" : "OFF");
+    // Switches Digital inputs
+    for (byte i = 0; i <= MAX_DIGITAL_IN_PORTS; i++) {
+      s += makeTag("switch", "", digitalRead(DI(i)) ? "ON" : "OFF");
     }
     
     // Checkboxes
-    s += makeTag("LED", "", LED_state[0] ? CHECKED_STR : UNCHECKED_STR);
-    s += makeTag("LED", "", LED_state[1] ? CHECKED_STR : UNCHECKED_STR);
+    // s += makeTag("LED", "", LED_state[0] ? CHECKED_STR : UNCHECKED_STR);
+    // s += makeTag("LED", "", LED_state[1] ? CHECKED_STR : UNCHECKED_STR);
     // Buttons
-    s += makeTag("LED", "", LED_state[2] ? "on" : "off");
-    s += makeTag("LED", "", LED_state[3] ? "on" : "off");
+    for (int8_t i = 1; i <= MAX_DIGITAL_OUT_PORTS; i++){
+      s += makeTag("DO", "", digitalRead(DO(i)) ? "on" : "off");
+    }
+
+    //s += makeTag("DO", "", LED_state[2] ? "on" : "off");
+    //s += makeTag("DO", "", LED_state[3] ? "on" : "off");
   s += closeInputs();
   cl.println(s);
 } // respGeneric( )
@@ -499,23 +482,25 @@ void respGeneric(EthernetClient cl) {
 // Network
 
 void respNetwork(EthernetClient cl) {
+  byte mac[] = DEFAULT_FIRMWARE_MAC;
+  byte ip[] = DEFAULT_FIRMWARE_IP;
   String s = tagXmlVersion();
   s += openInputs();
-    s += makeTag(BASE_MAC, "1", String(SELF_MAC[0], HEX));
-    s += makeTag(BASE_MAC, "2", String(SELF_MAC[1], HEX));
-    s += makeTag(BASE_MAC, "3", String(SELF_MAC[2], HEX));
-    s += makeTag(BASE_MAC, "4", String(SELF_MAC[3], HEX));
-    s += makeTag(BASE_MAC, "5", String(SELF_MAC[4], HEX));
-    s += makeTag(BASE_MAC, "6", String(SELF_MAC[5], HEX));
-    s += makeTag(BASE_IP,  "1", String(SELF_IP[0]));
-    s += makeTag(BASE_IP,  "2", String(SELF_IP[1]));
-    s += makeTag(BASE_IP,  "3", String(SELF_IP[2]));
-    s += makeTag(BASE_IP,  "4", String(SELF_IP[3]));
+    s += makeTag(BASE_MAC, "1", String(mac[0], HEX));
+    s += makeTag(BASE_MAC, "2", String(mac[1], HEX));
+    s += makeTag(BASE_MAC, "3", String(mac[2], HEX));
+    s += makeTag(BASE_MAC, "4", String(mac[3], HEX));
+    s += makeTag(BASE_MAC, "5", String(mac[4], HEX));
+    s += makeTag(BASE_MAC, "6", String(mac[5], HEX));
+    s += makeTag(BASE_IP,  "1", String(ip[0]));
+    s += makeTag(BASE_IP,  "2", String(ip[1]));
+    s += makeTag(BASE_IP,  "3", String(ip[2]));
+    s += makeTag(BASE_IP,  "4", String(ip[3]));
   s += closeInputs();
   cl.println(s);
 }
 
-// Electro
+/*// Electro
 
 void setElectroCtrl() {
 
@@ -543,7 +528,7 @@ void respSettings(EthernetClient cl) {
   s += closeInputs();
   cl.println(s);
 }
-
+*/
 // Themes
 
 void setTheme() {
@@ -578,7 +563,7 @@ void respThemes(EthernetClient cl) {
   s += closeInputs();
   cl.println(s);
 }
-
+/*
 // Control
 
 byte light1 = 0;
@@ -850,8 +835,10 @@ void respNrf24(EthernetClient cl) {
   s += closeInputs();
   cl.println(s);
 }
-
+*/
 // Check page
+
+byte currentPage = UNKNOWN_PAGE;
 
 void checkPage() {
   currentPage = UNKNOWN_PAGE;
@@ -861,7 +848,7 @@ void checkPage() {
   else if (StrContains(HTTP_req, "supply-page"))   {currentPage = SUPPLY_PAGE;}
   else if (StrContains(HTTP_req, "electro-page"))  {currentPage = ELECTRO_PAGE;}  
 }
-
+/*
 // Oscill
 
 void checkOscill() {
@@ -951,4 +938,4 @@ void respDash(EthernetClient cl) {
   s += closeInputs();
   cl.println(s);
 } // respDash( )
-
+*/

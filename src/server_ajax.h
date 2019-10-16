@@ -67,3 +67,12 @@ String makeHttpReq();
 void respIndicators(EthernetClient cl);
 // Generic
 void setGeneric();
+void respGeneric(EthernetClient cl);
+// Network
+void respNetwork(EthernetClient cl);
+
+// Themes
+void setTheme();
+String getThemeCode();
+void respThemes(EthernetClient cl);
+

@@ -17,6 +17,8 @@ void setup_main() {
 void loop_main() {
   #ifdef SIMPLE_SERVER
   simplepage();
+  #else 
+  serverWorks();
   #endif
 }
 

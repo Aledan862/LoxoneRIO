@@ -1,4 +1,5 @@
 // Configuration of drivers enabled
+#pragma once
 
 #ifndef AVR_DMXOUT_PIN
 #define AVR_DMXOUT_PIN 3
@@ -25,6 +26,8 @@
 // DNS[]    = {   ,    ,   ,   }
 // GATEWAY[]  = {192, 168,  1,  1}
 #endif
+
+#define SIMPLE_SERVER
 
 #ifndef LAN_INIT_DELAY
 #define LAN_INIT_DELAY 500

@@ -277,6 +277,28 @@ char StrContains(char *str, char *sfind) {
   return 0;
 }
 
+char StrContains(char *str, String strfind) {
+  
+  char found = 0;
+  char index = 0;
+  char len;
+
+  len = strlen(str);
+  if (strlen(strfind.c_str()) > len) {return 0;}
+  
+  while (index < len) {
+    if (str[index] == strfind[found]) {
+      found++;
+      if (strlen(strfind.c_str()) == found) {return 1;}
+    } else {
+        found = 0;
+      }
+    index++;
+  }
+  return 0;
+}
+
+
 
 #pragma message(VAR_NAME_VALUE(debugSerial))
 #pragma message(VAR_NAME_VALUE(SERIAL_BAUD))

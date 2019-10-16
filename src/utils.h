@@ -17,6 +17,8 @@ GIT:      https://github.com/anklimov/lighthub
 e-mail    anklimov@gmail.com
 
 */
+#pragma once
+
 #ifndef utils_h
 #define utils_h
 
@@ -52,5 +54,6 @@ void softRebootFunc();
 
 void StrClear(char *str, char length);
 char StrContains(char *str, char *sfind);
+char StrContains(char *str, String strfind);
 
 #endif

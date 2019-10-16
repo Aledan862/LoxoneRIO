@@ -4,6 +4,7 @@
 #include <Ethernet2.h>
 #include "utils.h"
 #include "options.h"
+#include "iomodule.h"
 
 
 // Initialize the Ethernet server library

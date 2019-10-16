@@ -43,6 +43,7 @@ String backgroundIpAttr(String fileName) {
   return s;
 }
 
+
 void addBackgroundStyle(String style, String file, EthernetClient cl) {
   String s = OPEN_BLOCK_STYLE;
   s += openStyle(style);
@@ -94,6 +95,8 @@ void insertThis(String fileNname, EthernetClient cl) {
     insertFile.close();
   }
 }
+
+byte currentDesign = DESIGN_DEFAULT;
 
 void insertBlock(uint8_t operation, EthernetClient cl) {
   byte insertMode = NORMAL;

@@ -2,8 +2,10 @@
   Module Pages Maker
   part of Arduino Mega Server project
 */
+#pragma once
+
 #include "utils.h"
-#include <SD.h>
+#include "SD.h"
 #include <Ethernet2.h>
 
 
@@ -32,13 +34,11 @@ String backgroundIpAttr(String fileName);
 #define DESIGN_PART2   5
 #define DESIGN_PART3   6
 #define DESIGN_PART4   7
-byte currentDesign = DESIGN_DEFAULT;
+
 void addBackgroundStyle(String style, String file, EthernetClient cl);
 String themeSuffix(byte design);
 
 void generateProArray();
-
-
 
 // Pages
 #define UNKNOWN_PAGE   0
@@ -47,7 +47,7 @@ void generateProArray();
 #define PORTS_PAGE     6
 #define SUPPLY_PAGE    7
 #define ELECTRO_PAGE   8
-byte currentPage = UNKNOWN_PAGE;
+
 
 #define GET           "GET /"
 #define INDEX_STR     "index"
@@ -80,6 +80,7 @@ byte currentPage = UNKNOWN_PAGE;
 #define JQUERY     0x3D // =
 
 
+extern byte currentDesign;
 void addBackgroundStyle(String style, String file, EthernetClient cl);
 
 void insert(File file, EthernetClient cl);
