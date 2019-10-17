@@ -78,10 +78,17 @@ uint8_t DI (uint8_t number){
     return dipinout[number-1][1];
 };
 
+
 void doInit(){
     for (uint8_t i=0;i<25;i++){
         pinMode(dopinout[i][1],OUTPUT);
     }
+
+    for (uint8_t i = 0; i < MAX_DIGITAL_IN_PORTS; i++)
+    {
+        di[]
+    }
+    
 
     // добавить проверку для конфигурируемых выводов
     
